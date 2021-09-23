@@ -20,6 +20,8 @@ var checkPoint;
 
 var estado = "inicio";
 
+var larguraTela=window.innerWidth
+
 function reset(){
   estado ="jogar"
   
@@ -36,7 +38,7 @@ function reset(){
 
 function obstaculos() {  
   if (frameCount % 60 === 0){
-   var obstaculo =createSprite(500,180,20,60);
+   var obstaculo =createSprite(larguraTela,180,20,60);
     obstaculo.velocityX = -(6+pontuacao/100)
     
     var indice = Math.round(random(1,6))
@@ -57,7 +59,7 @@ function obstaculos() {
         default:break
     }
         
-    obstaculo.lifetime = 90
+    obstaculo.lifetime = larguraTela/2                    
         
     grupoDeObstaculos.add(obstaculo);
   }
@@ -65,11 +67,11 @@ function obstaculos() {
 
 function nuvens() {
   if (frameCount % 60 === 0){
-    var nuvem =createSprite(600,100,40,10);
+    var nuvem =createSprite(larguraTela,100,40,10);
     nuvem.addImage(nuvemImg);
     nuvem.velocityX = -3;
     nuvem.y = Math.round(random(10,60));
-    nuvem.lifetime = 215;
+    nuvem.lifetime = larguraTela;
     nuvem.depth= trex.depth;
     trex.depth = trex.depth +1;
     
@@ -105,16 +107,16 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(600, 200);
+  createCanvas(larguraTela, 200);
   
   var mensagem ="O gabriel é bonito"
   
   
-  restart=createSprite(300, 140);
+  restart=createSprite(larguraTela/2, 140);
   restart.addImage(restartImagem)
   restart.scale=0.7
   
-  gameOver=createSprite(300, 100);
+  gameOver=createSprite(larguraTela/2, 100);
   gameOver.addImage(gameOverImagem)
   
   trex = createSprite(50, 150,  20, 50);
@@ -126,12 +128,12 @@ function setup() {
   // alterei a escala do tamanho do trex
   trex.scale = 0.7;
   
-  chao = createSprite(200, 190, 300, 20);
+  chao = createSprite(larguraTela/2, 190, larguraTela, 20);
   
   // adicionei animacao chaoMovendo no chao
   chao.addAnimation("chaoAnimado", chaoMovendo);
   
-  chaoInvisivel = createSprite(300, 205, 600, 20);
+  chaoInvisivel = createSprite(larguraTela/2, 205, larguraTela, 20);
   chaoInvisivel.visible=false;
   
   grupoDeObstaculos = new Group();
@@ -143,7 +145,7 @@ function setup() {
 function draw() {
   background("white");
   
-  text("pontuação: "+ pontuacao, 225,50)
+  text("pontuação: "+ pontuacao, larguraTela/2,50)
   
   // adicionei gravidade ao trex
     trex.velocityY = trex.velocityY + 1;
@@ -162,9 +164,10 @@ function draw() {
       chao.x = chao.width / 2;
     }
     
-     if (keyDown("space") && trex.y >= 97) {
+     if ((keyDown("space") || touches.length > 0) && trex.y >= 97) {
       trex.velocityY = -12;
        pulo.play()
+       touches=[]
     }
     
     obstaculos();
@@ -195,16 +198,17 @@ function draw() {
     grupoDeObstaculos.setVelocityXEach(0);
     grupoDeNuvens.setVelocityXEach(0);
     
-    if(mousePressedOver(restart)){
+    if(mousePressedOver(restart) || touches.length > 0){
      reset();
+     touches=[]
     }
   } else if (estado === "inicio"){
     restart.visible=false
     gameOver.visible=false
     trex.changeAnimation("parado",trexParado)
-   if (keyDown("space")){
+   if (keyDown("space") || touches.length > 0){
     estado = "jogar"
-    
+    touches=[]
  }      
 }
   
